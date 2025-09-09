@@ -939,7 +939,8 @@ def get_document_plain_text(dify_file_id: str):
         db.close()
 
 @app.get("/api/documents/{dify_file_id}/download")
-def download_document(dify_file_id: str, current_user = Depends(get_current_user)):
+def download_document(dify_file_id: str):
+#def download_document(dify_file_id: str, current_user = Depends(get_current_user)):
     """
     通过 dify_file_id 下载本地存储的原始文件。
     """
