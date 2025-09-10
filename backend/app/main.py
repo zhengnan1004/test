@@ -197,12 +197,12 @@ DIFY_ANNOTATION_API_KEY = os.getenv(
 
  
 
-@app.get("/")
+@app.get("/", tags=["system"])
 def root():
     return {"msg": "Course Workflow API is running"}
 
 # 新增：草稿密钥校验接口
-@app.post("/api/courses/draft/verify")
+@app.post("/api/courses/draft/verify", tags=["courses"])
 def verify_draft_secret(secret: str = Form(...)):
     if not secret:
         raise HTTPException(status_code=400, detail="缺少密钥")
@@ -220,7 +220,7 @@ def verify_draft_secret(secret: str = Form(...)):
 # Dify 注释API接口
 # ========================
 
-@app.post("/api/annotations/{comment_id}/upload-to-dify")
+@app.post("/api/annotations/{comment_id}/upload-to-dify", tags=["annotations"])
 def upload_annotation_to_dify(comment_id: int):
     """
     根据comment_id将AI回复上传到Dify标注平台
@@ -319,7 +319,7 @@ def upload_annotation_to_dify(comment_id: int):
         print(f"异常详情: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=error_msg)
 
-@app.get("/api/annotations/{comment_id}")
+@app.get("/api/annotations/{comment_id}", tags=["annotations"])
 def get_dify_annotation_by_id(comment_id: int):
     """
     根据comment_id获取特定的Dify注释记录
@@ -368,7 +368,7 @@ def get_dify_annotation_by_id(comment_id: int):
         print(f"异常详情: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=error_msg)
 
-@app.put("/api/annotations/{comment_id}")
+@app.put("/api/annotations/{comment_id}", tags=["annotations"])
 def update_dify_annotation_by_id(comment_id: int, body: DifyAnnotationRequest):
     """
     根据comment_id更新特定的Dify注释记录
@@ -436,7 +436,7 @@ def update_dify_annotation_by_id(comment_id: int, body: DifyAnnotationRequest):
         print(f"异常详情: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=error_msg)
 
-@app.delete("/api/annotations/{comment_id}")
+@app.delete("/api/annotations/{comment_id}", tags=["annotations"])
 def delete_dify_annotation_by_id(comment_id: int):
     """
     根据comment_id删除特定的Dify注释记录
@@ -484,7 +484,7 @@ def delete_dify_annotation_by_id(comment_id: int):
         print(f"异常详情: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=error_msg)
 
-@app.post("/api/workbench/run-text")
+@app.post("/api/workbench/run-text", tags=["workbench"])
 def run_dify_workbench_with_text(body: DifyWorkbenchTextRequest):
     """
     将用户输入的纯文本转发到 Dify 新工作台（/chat-messages），并启动执行。
@@ -579,7 +579,7 @@ def run_dify_workbench_with_text(body: DifyWorkbenchTextRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/course/workflow")
+@app.post("/api/course/workflow", tags=["courses"])
 async def start_course_workflow(
     title: str = Form(..., description="课程标题"),
     description: str = Form(..., description="课程描述"),
@@ -723,7 +723,7 @@ async def start_course_workflow(
 # 现在使用 /api/documents 接口进行文件上传和自动分类
 
 
-@app.get("/api/files/status")
+@app.get("/api/files/status", tags=["system"])
 def get_upload_status():
     """
     获取文件上传服务状态
@@ -737,7 +737,7 @@ def get_upload_status():
     }
 
 
-@app.post("/api/paid/verify")
+@app.post("/api/paid/verify", tags=["system"])
 def verify_paid_secret(secret: str = Form("", description="付费资源访问密钥")):
     """
     校验付费资源访问密钥。前端在执行查看/下载/删除等操作前调用。
@@ -754,7 +754,7 @@ def verify_paid_secret(secret: str = Form("", description="付费资源访问密
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/documents")
+@app.get("/api/documents", tags=["documents"])
 def get_documents_list(
     skip: int = Query(0, ge=0, description="跳过记录数"),
     limit: int = Query(100, ge=1, le=1000, description="返回记录数"),
@@ -805,7 +805,7 @@ def get_documents_list(
 
 
 # 更新AI反馈的类型（good 或 not not satisfied）
-@app.put("/api/v1/ai-feedback/{comment_id}")
+@app.put("/api/v1/ai-feedback/{comment_id}", tags=["ai-feedback"])
 def update_ai_feedback(comment_id: int, body: schemas.AiFeedbackUpdate):
     try:
         db = SessionLocal()
@@ -833,7 +833,7 @@ def update_ai_feedback(comment_id: int, body: schemas.AiFeedbackUpdate):
 
 
 # 获取AI反馈记录列表
-@app.get("/api/v1/ai-feedback/records", response_model=schemas.AiFeedbackListResponse)
+@app.get("/api/v1/ai-feedback/records", response_model=schemas.AiFeedbackListResponse, tags=["ai-feedback"])
 def get_ai_feedback_records(
     skip: int = 0,
     limit: int = 100,
@@ -873,7 +873,7 @@ def get_ai_feedback_records(
 
 
 # 获取AI反馈统计信息
-@app.get("/api/v1/ai-feedback/stats", response_model=schemas.AiFeedbackStatsResponse)
+@app.get("/api/v1/ai-feedback/stats", response_model=schemas.AiFeedbackStatsResponse, tags=["ai-feedback"])
 def get_ai_feedback_stats():
     """获取AI反馈统计信息"""
     try:
@@ -896,7 +896,7 @@ def get_ai_feedback_stats():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/documents/{dify_file_id}/text")
+@app.get("/api/documents/{dify_file_id}/text", tags=["documents"])
 def get_document_plain_text(dify_file_id: str):
     """
     返回文档的纯文本内容（当前支持 .txt 与 .docx）。
@@ -938,7 +938,7 @@ def get_document_plain_text(dify_file_id: str):
     finally:
         db.close()
 
-@app.get("/api/documents/{dify_file_id}/download")
+@app.get("/api/documents/{dify_file_id}/download", tags=["documents"])
 def download_document(dify_file_id: str):
 #def download_document(dify_file_id: str, current_user = Depends(get_current_user)):
     """
@@ -967,7 +967,7 @@ def download_document(dify_file_id: str):
         db.close()
 
 
-@app.put("/api/documents/{dify_file_id}/replace")
+@app.put("/api/documents/{dify_file_id}/replace", tags=["documents"])
 async def replace_document_file(
     dify_file_id: str,
     file: UploadFile = File(..., description="新的文件内容"),
@@ -1082,7 +1082,7 @@ async def replace_document_file(
     finally:
         db.close()
 
-@app.post("/api/documents")
+@app.post("/api/documents", tags=["documents"])
 async def upload_and_classify_document(
     file: UploadFile = File(..., description="要上传的文档文件"),
     access: str = Form("FREE", description="访问权限：FREE 或 PAID"),
@@ -1355,7 +1355,7 @@ async def upload_and_classify_document(
         raise HTTPException(status_code=500, detail=error_msg)
 
 
-@app.post("/api/search/query")
+@app.post("/api/search/query", tags=["search"])
 async def search_with_text(body: RunWorkflowWithTextRequest, current_user = Depends(get_current_user)):
     """
     使用用户输入的文本调用 Dify 搜索应用。
@@ -1428,7 +1428,7 @@ async def search_with_text(body: RunWorkflowWithTextRequest, current_user = Depe
         raise HTTPException(status_code=500, detail=error_msg)
 
 
-@app.delete("/api/documents/{dify_file_id}")
+@app.delete("/api/documents/{dify_file_id}", tags=["documents"])
 def delete_document(dify_file_id: str, current_user = Depends(get_current_user)):
     """
     删除文档记录和本地文件
@@ -1484,7 +1484,7 @@ def delete_document(dify_file_id: str, current_user = Depends(get_current_user))
         db.close()
 
 
-@app.put("/api/documents/{dify_file_id}/classification")
+@app.put("/api/documents/{dify_file_id}/classification", tags=["documents"])
 def update_document_classification(
     dify_file_id: str,
     classification_update: schemas.DocumentClassificationUpdateRequest,
@@ -1542,7 +1542,7 @@ def update_document_classification(
 # 课程管理相关接口
 # ========================
 
-@app.get("/api/courses")
+@app.get("/api/courses", tags=["courses"])
 def get_courses_list(
     skip: int = Query(0, ge=0, description="跳过记录数"),
     limit: int = Query(100, ge=1, le=1000, description="返回记录数"),
@@ -1590,7 +1590,7 @@ def get_courses_list(
         db.close()
 
 
-@app.get("/api/courses/{course_id}")
+@app.get("/api/courses/{course_id}", tags=["courses"])
 def get_course_detail(course_id: int, current_user = Depends(get_current_user)):
     """
     获取课程详情
@@ -1619,7 +1619,7 @@ def get_course_detail(course_id: int, current_user = Depends(get_current_user)):
         db.close()
 
 
-@app.put("/api/courses/{course_id}")
+@app.put("/api/courses/{course_id}", tags=["courses"])
 def update_course_info(
     course_id: int,
     course_update: CourseData,
@@ -1666,7 +1666,7 @@ def update_course_info(
         db.close()
 
 
-@app.delete("/api/courses/{course_id}")
+@app.delete("/api/courses/{course_id}", tags=["courses"])
 def delete_course_record(
     course_id: int,
     current_user: str = Form("web_user")

@@ -1059,7 +1059,7 @@ export default {
   flex-direction: column;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .ai-chat-container::before {
@@ -1117,6 +1117,7 @@ export default {
   min-height: 0;
   position: relative;
   z-index: 1;
+  overflow: hidden;
 }
 
 /* 初始界面样式 */
@@ -1372,7 +1373,7 @@ export default {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 25px;
+  padding: 25px 25px 120px 25px;
   display: flex;
   flex-direction: column;
   gap: 25px;
@@ -1600,6 +1601,12 @@ export default {
   -webkit-backdrop-filter: blur(15px);
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 -2px 20px rgba(0,0,0,0.1);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  flex-shrink: 0;
 }
 
 .input-wrapper {
@@ -2564,6 +2571,10 @@ export default {
   
   .chat-input-container {
     padding: 15px 20px;
+  }
+  
+  .chat-messages {
+    padding: 25px 25px 100px 25px;
   }
   
   .input-wrapper {
