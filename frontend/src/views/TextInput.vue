@@ -123,11 +123,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import axios from 'axios'
 
 const router = useRouter()
+const authStore = useAuthStore()
 const content = ref('')
 const showPreview = ref(false)
 
@@ -137,6 +139,21 @@ const selectedFile = ref(null)
 const loading = ref(false) // 添加上传加载状态
 const username = ref('web_user') // 用户名，默认为 web_user
 const accessType = ref('Free') // 访问权限，默认为免费
+
+// 初始化用户名
+onMounted(() => {
+  // 如果用户已登录，使用登录用户名
+  if (authStore.user?.username) {
+    username.value = authStore.user.username
+  }
+})
+
+// 监听用户登录状态变化
+watch(() => authStore.user, (newUser) => {
+  if (newUser?.username) {
+    username.value = newUser.username
+  }
+}, { immediate: true })
 
 // 计算属性
 const isSuccess = computed(() => {
